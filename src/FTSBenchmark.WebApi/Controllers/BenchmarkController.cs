@@ -1,5 +1,5 @@
 using FTSBenchmark.Application.Handlers;
-using FTSBenchmark.Application.Models;
+using FTSBenchmark.Domain;
 using Microsoft.AspNetCore.Mvc;
 using FTSBenchmark.Models;
 using MediatR;
@@ -36,12 +36,20 @@ public class BenchmarkController : ControllerBase
         return Task.FromResult(result);
     }
 
-    [HttpPost("seed", Name = "Seed data")]
+    [HttpPost("data/seed", Name = "Seed data")]
     public async Task<IActionResult> SeedData([FromQuery]int count=10)
     {
         var request = SeedDatabaseRequest.WithCount(count);
         var response = await _mediator.Send(request);
         return Ok(ListResponse<PersonModel>.FromData(response.Persons));
+    }
+    
+    [HttpGet("data/count", Name = "Number of seeded records")]
+    public async Task<IActionResult> GetSeedDataCount()
+    {
+        var request = GetSeedDataCountRequest.Empty();
+        var response = await _mediator.Send(request);
+        return Ok(response.Count);
     }
 }
 

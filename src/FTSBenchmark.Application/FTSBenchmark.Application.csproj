@@ -12,4 +12,13 @@
       <PackageReference Include="MediatR" Version="12.2.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\FTSBenchmark.Domain\FTSBenchmark.Domain.csproj" />
+      <ProjectReference Include="..\FTSBenchmark.Infrastructure\FTSBenchmark.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\" />
+    </ItemGroup>
+
 </Project>

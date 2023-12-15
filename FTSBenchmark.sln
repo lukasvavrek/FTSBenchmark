@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTSBenchmark.Infrastructure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTSBenchmark.Application", "src\FTSBenchmark.Application\FTSBenchmark.Application.csproj", "{247A3FA0-AE24-4454-AFFD-63BF2A13583B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTSBenchmark.Domain", "src\FTSBenchmark.Domain\FTSBenchmark.Domain.csproj", "{671391B5-9233-42CB-BEBD-D7ED0137AC36}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{247A3FA0-AE24-4454-AFFD-63BF2A13583B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{247A3FA0-AE24-4454-AFFD-63BF2A13583B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{247A3FA0-AE24-4454-AFFD-63BF2A13583B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{671391B5-9233-42CB-BEBD-D7ED0137AC36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{671391B5-9233-42CB-BEBD-D7ED0137AC36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{671391B5-9233-42CB-BEBD-D7ED0137AC36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{671391B5-9233-42CB-BEBD-D7ED0137AC36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
