@@ -51,5 +51,13 @@ public class BenchmarkController : ControllerBase
         var response = await _mediator.Send(request);
         return Ok(response.Count);
     }
+    
+    [HttpGet("search", Name = "Search users")]
+    public async Task<IActionResult> SearchUsers([FromQuery] string query, [FromQuery] SearchStrategy strategy = SearchStrategy.Like)
+    {
+        var request = SearchUsersRequest.WithQuery(query, strategy);
+        var response = await _mediator.Send(request);
+        return Ok(ListResponse<PersonModel>.FromData(response.Persons));
+    }
 }
 

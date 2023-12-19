@@ -1,5 +1,4 @@
 # FTSBenchmark
-
 Simple .net project to execute several different set of benchmarks.
 The idea came from the problem that we run into the performance issue and had
 to design a proposal with the strategy how to do it better.
@@ -16,3 +15,22 @@ we understand what's goin on.
 * write search handler that uses `LIKE` (existing solution)
 * write search handler that uses `MATCH` full-text index
 * write handler that uses both and presents results
+
+## Notes
+
+### DB Migrations
+
+Create new migration:
+```
+dotnet ef migrations add "Initial-schema" \
+    --project src/FTSBenchmark.Infrastructure \
+    --startup-project src/FTSBenchmark.WebApi \
+    --output-dir Database/Migrations
+```
+
+Apply migrations to DB:
+```
+dotnet ef database update \
+    --project src/FTSBenchmark.Infrastructure \
+    --startup-project src/FTSBenchmark.WebApi
+```
