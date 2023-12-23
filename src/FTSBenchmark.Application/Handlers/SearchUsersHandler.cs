@@ -3,7 +3,7 @@ using FTSBenchmark.Domain;
 using FTSBenchmark.Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
+using Microsoft.Extensions.Logging;
 
 namespace FTSBenchmark.Application.Handlers;
 
@@ -30,14 +30,18 @@ public class SearchUsersResponse
 public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUsersResponse>
 {
     private readonly IBenchmarkDbContext _dbContext;
+    private readonly ILogger<SearchUsersHandler> _logger;
 
-    public SearchUsersHandler(IBenchmarkDbContext dbContext)
+    public SearchUsersHandler(IBenchmarkDbContext dbContext, ILogger<SearchUsersHandler> logger)
     {
         _dbContext = dbContext;
+        _logger = logger;
     }
     
     public Task<SearchUsersResponse> Handle(SearchUsersRequest request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation($"Executing search with strategy {request.Strategy} and query {request.Query}");
+        
         return request.Strategy switch
         {
             SearchStrategy.Like => HandleLike(request, cancellationToken),
@@ -50,13 +54,11 @@ public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUser
     {
         // NOTE: this is vulnerable to SQL injection
         var query = $"select * from Persons where concat(FirstName, LastName) like '%{request.Query}%' or concat(LastName, FirstName) like '%{request.Query}%';";
-
-        var count = await _dbContext.Persons.CountAsync(cancellationToken: cancellationToken);
         
         var persons = await _dbContext.Persons
             .FromSqlRaw(query)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
-        
         
         return new SearchUsersResponse { Persons = persons };
     }
@@ -69,6 +71,7 @@ public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUser
         
         var persons = await _dbContext.Persons
             .Where(filterQuery)
+            .AsNoTracking()
             .ToListAsync(cancellationToken: cancellationToken);
         
         return new SearchUsersResponse { Persons = persons };

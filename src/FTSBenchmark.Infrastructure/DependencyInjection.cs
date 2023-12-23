@@ -17,8 +17,11 @@ public static class DependencyInjection
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<BenchmarkDbContext>(options =>
-                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), 
-                    b => b.MigrationsAssembly(typeof(BenchmarkDbContext).Assembly.FullName)));
+                    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
+                        b => b.MigrationsAssembly(typeof(BenchmarkDbContext).Assembly.FullName)),
+                // NOTE: using Transient instead of Scoped to void (minimize) caching
+                ServiceLifetime.Transient
+            );
         }
 
         services.AddScoped<IBenchmarkDbContext>(provider => provider.GetService<BenchmarkDbContext>());

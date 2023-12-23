@@ -26,22 +26,19 @@ public class BenchmarkController : ControllerBase
     }
 
     [HttpPost("execute", Name = "Execute benchmark")]
-    public Task<BResult> ExecuteBenchmark()
+    public async Task<IActionResult> ExecuteBenchmark([FromQuery]int runs = 10)
     {
-        var rng = new Random();
-        var result = new BResult
-        {
-            Time = rng.NextDouble()
-        };
-        return Task.FromResult(result);
+        var request = ExecuteBenchmarkRequest.WithRuns(runs);
+        var response = await _mediator.Send(request);
+        return Ok(response.Results);
     }
 
     [HttpPost("data/seed", Name = "Seed data")]
     public async Task<IActionResult> SeedData([FromQuery]int count=10)
     {
         var request = SeedDatabaseRequest.WithCount(count);
-        var response = await _mediator.Send(request);
-        return Ok(ListResponse<PersonModel>.FromData(response.Persons));
+        _ = await _mediator.Send(request);
+        return Ok();
     }
     
     [HttpGet("data/count", Name = "Number of seeded records")]

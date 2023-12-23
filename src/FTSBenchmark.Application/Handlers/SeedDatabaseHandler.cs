@@ -4,6 +4,7 @@ using FTSBenchmark.Application.Handlers.Dto;
 using FTSBenchmark.Domain;
 using FTSBenchmark.Infrastructure.Database;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 
 namespace FTSBenchmark.Application.Handlers;
 
@@ -23,35 +24,67 @@ public class SeedDatabaseRequest : IRequest<SeedDatabaseResponse>
 
 public class SeedDatabaseResponse
 {
-    public List<PersonModel> Persons { get; init; }
 }
 
 internal class SeedDatabaseHandler : IRequestHandler<SeedDatabaseRequest, SeedDatabaseResponse>
 {
     private readonly IBenchmarkDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _configuration;
     private readonly HttpClient _httpClient = new();
     
     private const string UrlFmt = "https://random-data-api.com/api/v2/users?size={0}";
     private const int MaxBatchSize = 100;
 
-    public SeedDatabaseHandler(IBenchmarkDbContext dbContext, IMapper mapper)
+    public SeedDatabaseHandler(IBenchmarkDbContext dbContext, IMapper mapper, IConfiguration configuration)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _configuration = configuration;
     }
     
     public async Task<SeedDatabaseResponse> Handle(SeedDatabaseRequest request, CancellationToken cancellationToken)
+    {
+        if (_configuration.GetValue<bool>("UseLocalSeed"))
+        {
+            await SeedPersonFromFaker(request, cancellationToken);
+        }
+        else
+        {
+            await SeedPersonFromApi(request, cancellationToken);
+        }
+
+        return new SeedDatabaseResponse();
+    }
+
+    private async Task SeedPersonFromFaker(SeedDatabaseRequest request, CancellationToken cancellationToken)
+    {
+        var models = new List<PersonModel>();
+        for (var i = 0; i < request.Count; i++)
+        {
+            var model = new PersonModel
+            {
+                FirstName = Faker.Name.First(),
+                LastName = Faker.Name.Last(),
+            };
+            model.Username = $"{model.FirstName}.{model.LastName}".ToLower();
+            models.Add(model);
+        }
+
+        await _dbContext.Persons.AddRangeAsync(models, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task SeedPersonFromApi(SeedDatabaseRequest request, CancellationToken cancellationToken)
     {
         var tasks = FetchPersonsInBatches(request, cancellationToken);
         var persons = (await Task.WhenAll(tasks)).SelectMany(x => x);
 
         var models = _mapper.Map<List<PersonModel>>(persons);
-        
-        await _dbContext.Persons.AddRangeAsync(models, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return new SeedDatabaseResponse { Persons = models };
+        await _dbContext.Persons.AddRangeAsync(models, cancellationToken);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private IEnumerable<Task<List<PersonDto>>> FetchPersonsInBatches(SeedDatabaseRequest request, CancellationToken cancellationToken)
