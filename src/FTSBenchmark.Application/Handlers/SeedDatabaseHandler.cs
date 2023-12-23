@@ -3,6 +3,7 @@ using AutoMapper;
 using FTSBenchmark.Application.Handlers.Dto;
 using FTSBenchmark.Domain;
 using FTSBenchmark.Infrastructure.Database;
+using FTSBenchmark.Infrastructure.Postgres;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 
@@ -29,6 +30,7 @@ public class SeedDatabaseResponse
 internal class SeedDatabaseHandler : IRequestHandler<SeedDatabaseRequest, SeedDatabaseResponse>
 {
     private readonly IBenchmarkDbContext _dbContext;
+    private readonly PostgresDbContext _postgresDbContext;
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
     private readonly HttpClient _httpClient = new();
@@ -36,9 +38,14 @@ internal class SeedDatabaseHandler : IRequestHandler<SeedDatabaseRequest, SeedDa
     private const string UrlFmt = "https://random-data-api.com/api/v2/users?size={0}";
     private const int MaxBatchSize = 100;
 
-    public SeedDatabaseHandler(IBenchmarkDbContext dbContext, IMapper mapper, IConfiguration configuration)
+    public SeedDatabaseHandler(
+        IBenchmarkDbContext dbContext, 
+        PostgresDbContext postgresDbContext,
+        IMapper mapper, 
+        IConfiguration configuration)
     {
         _dbContext = dbContext;
+        _postgresDbContext = postgresDbContext;
         _mapper = mapper;
         _configuration = configuration;
     }
@@ -73,6 +80,9 @@ internal class SeedDatabaseHandler : IRequestHandler<SeedDatabaseRequest, SeedDa
 
         await _dbContext.Persons.AddRangeAsync(models, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        await _postgresDbContext.Persons.AddRangeAsync(models, cancellationToken);
+        await _postgresDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private async Task SeedPersonFromApi(SeedDatabaseRequest request, CancellationToken cancellationToken)

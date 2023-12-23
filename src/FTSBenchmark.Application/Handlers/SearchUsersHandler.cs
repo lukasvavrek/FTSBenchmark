@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using FTSBenchmark.Domain;
 using FTSBenchmark.Infrastructure.Database;
+using FTSBenchmark.Infrastructure.Postgres;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -30,11 +31,13 @@ public class SearchUsersResponse
 public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUsersResponse>
 {
     private readonly IBenchmarkDbContext _dbContext;
+    private readonly PostgresDbContext _postgresDbContext;
     private readonly ILogger<SearchUsersHandler> _logger;
 
-    public SearchUsersHandler(IBenchmarkDbContext dbContext, ILogger<SearchUsersHandler> logger)
+    public SearchUsersHandler(IBenchmarkDbContext dbContext, PostgresDbContext postgresDbContext, ILogger<SearchUsersHandler> logger)
     {
         _dbContext = dbContext;
+        _postgresDbContext = postgresDbContext;
         _logger = logger;
     }
     
@@ -47,6 +50,7 @@ public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUser
             SearchStrategy.Like => HandleLike(request, cancellationToken),
             SearchStrategy.Contains => HandleContains(request, cancellationToken),
             SearchStrategy.MatchAgainst => HandleMatchAgainst(request, cancellationToken),
+            SearchStrategy.TrigramPg => HandleTrigramPg(request, cancellationToken),
             _ => throw new NotImplementedException()
         };
     }
@@ -85,6 +89,19 @@ public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUser
         var query = $"select * from Persons where match(FirstName, LastName) against ('{request.Query}*' in boolean mode);";
         
         var persons = await _dbContext.Persons
+            .FromSqlRaw(query)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+        
+        return new SearchUsersResponse { Persons = persons };
+    }
+    
+    private async Task<SearchUsersResponse> HandleTrigramPg(SearchUsersRequest request, CancellationToken cancellationToken)
+    {
+        // NOTE: this is vulnerable to SQL injection
+        var query = $"select * from Persons where lower(concat(FirstName, LastName)) like '%{request.Query}%' or lower(concat(LastName, FirstName)) like '%{request.Query}%';";
+        
+        var persons = await _postgresDbContext.Persons
             .FromSqlRaw(query)
             .AsNoTracking()
             .ToListAsync(cancellationToken);

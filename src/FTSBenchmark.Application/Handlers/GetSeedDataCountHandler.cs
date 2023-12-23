@@ -1,4 +1,5 @@
 using FTSBenchmark.Infrastructure.Database;
+using FTSBenchmark.Infrastructure.Postgres;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,21 +22,27 @@ public class GetSeedDataCountRequest : IRequest<GetSeedDataCountResponse>
 
 public class GetSeedDataCountResponse
 {
-    public int Count { get; init; }
+    public int MariaDbCount { get; init; }
+    public int PostgresCount { get; init; }
 }
 
 internal class GetSeedDataCountHandler : IRequestHandler<GetSeedDataCountRequest, GetSeedDataCountResponse>
 {
     private readonly IBenchmarkDbContext _dbContext;
+    private readonly PostgresDbContext _postgresDbContext;
 
-    public GetSeedDataCountHandler(IBenchmarkDbContext dbContext)
+    public GetSeedDataCountHandler(IBenchmarkDbContext dbContext, PostgresDbContext postgresDbContext)
     {
         _dbContext = dbContext;
+        _postgresDbContext = postgresDbContext;
     }
     
     public async Task<GetSeedDataCountResponse> Handle(GetSeedDataCountRequest request, CancellationToken cancellationToken)
     {
-        var count = await _dbContext.Persons.CountAsync(cancellationToken);
-        return new GetSeedDataCountResponse { Count = count };
+        return new GetSeedDataCountResponse
+        {
+            MariaDbCount = await _dbContext.Persons.CountAsync(cancellationToken),
+            PostgresCount = await _postgresDbContext.Persons.CountAsync(cancellationToken)
+        };
     }
 }

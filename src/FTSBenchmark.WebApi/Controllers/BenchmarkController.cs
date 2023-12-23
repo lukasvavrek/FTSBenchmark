@@ -46,7 +46,7 @@ public class BenchmarkController : ControllerBase
     {
         var request = GetSeedDataCountRequest.Empty();
         var response = await _mediator.Send(request);
-        return Ok(response.Count);
+        return Ok(response);
     }
     
     [HttpGet("search", Name = "Search users")]

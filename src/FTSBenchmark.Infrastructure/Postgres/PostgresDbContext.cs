@@ -1,22 +1,24 @@
 using FTSBenchmark.Domain;
-using FTSBenchmark.Infrastructure.Database.Configurations;
+using FTSBenchmark.Infrastructure.Postgres.Configurations;
 using Microsoft.EntityFrameworkCore;
 
-namespace FTSBenchmark.Infrastructure.Database;
+namespace FTSBenchmark.Infrastructure.Postgres;
 
-public class BenchmarkDbContext : DbContext, IBenchmarkDbContext
+public class PostgresDbContext : DbContext
 {
     public DbSet<PersonModel> Persons { get; set; }
-    
-    public BenchmarkDbContext(DbContextOptions<BenchmarkDbContext> options)
+
+    public PostgresDbContext(DbContextOptions<PostgresDbContext> options)
         : base(options)
     {
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.HasPostgresExtension("pg_trgm");
         // builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        builder.ApplyConfiguration(new PersonModelConfiguration());
+        
+        builder.ApplyConfiguration(new PersonPostgresModelConfiguration());
 
         base.OnModelCreating(builder);
     }
