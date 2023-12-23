@@ -46,12 +46,14 @@ public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUser
         {
             SearchStrategy.Like => HandleLike(request, cancellationToken),
             SearchStrategy.Contains => HandleContains(request, cancellationToken),
+            SearchStrategy.MatchAgainst => HandleMatchAgainst(request, cancellationToken),
             _ => throw new NotImplementedException()
         };
     }
     
     private async Task<SearchUsersResponse> HandleLike(SearchUsersRequest request, CancellationToken cancellationToken)
     {
+        // MariaDB can use indexes for LIKE on string columns in the case where the LIKE doesn't start with % or _.
         // NOTE: this is vulnerable to SQL injection
         var query = $"select * from Persons where concat(FirstName, LastName) like '%{request.Query}%' or concat(LastName, FirstName) like '%{request.Query}%';";
         
@@ -73,6 +75,19 @@ public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUser
             .Where(filterQuery)
             .AsNoTracking()
             .ToListAsync(cancellationToken: cancellationToken);
+        
+        return new SearchUsersResponse { Persons = persons };
+    }
+    
+    private async Task<SearchUsersResponse> HandleMatchAgainst(SearchUsersRequest request, CancellationToken cancellationToken)
+    {
+        // NOTE: this is vulnerable to SQL injection
+        var query = $"select * from Persons where match(FirstName, LastName) against ('{request.Query}*' in boolean mode);";
+        
+        var persons = await _dbContext.Persons
+            .FromSqlRaw(query)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
         
         return new SearchUsersResponse { Persons = persons };
     }

@@ -9,5 +9,10 @@ public class PersonModelConfiguration : IEntityTypeConfiguration<PersonModel>
     public void Configure(EntityTypeBuilder<PersonModel> builder)
     {
         builder.Property(e => e.Id).ValueGeneratedOnAdd();
+        
+        builder
+            .HasIndex(p => new { p.FirstName, p.LastName })
+            .HasDatabaseName("idx_fulltext")
+            .IsFullText();
     }
 }

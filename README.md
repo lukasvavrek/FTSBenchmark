@@ -34,3 +34,12 @@ dotnet ef database update \
     --project src/FTSBenchmark.Infrastructure \
     --startup-project src/FTSBenchmark.WebApi
 ```
+
+## Relevant links
+
+[MariaDB full-text index overview](https://mariadb.com/kb/en/full-text-index-overview/)
+
+### Elastic search
+
+[Getting started with NEST (C#)](https://www.elastic.co/guide/en/elasticsearch/client/net-api/7.17/nest-getting-started.html)
+[String querying](https://opster.com/guides/elasticsearch/search-apis/elasticsearch-string-contains-substring/)

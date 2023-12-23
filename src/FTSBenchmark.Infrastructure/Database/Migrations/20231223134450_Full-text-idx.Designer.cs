@@ -2,6 +2,7 @@
 using FTSBenchmark.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FTSBenchmark.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(BenchmarkDbContext))]
-    partial class BenchmarkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231223134450_Full-text-idx")]
+    partial class Fulltextidx
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

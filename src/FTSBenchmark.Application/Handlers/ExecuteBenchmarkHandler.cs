@@ -39,23 +39,29 @@ public class ExecuteBenchmarkHandler : IRequestHandler<ExecuteBenchmarkRequest, 
         
         var strategies = Enum.GetValues<SearchStrategy>();
 
+        var queries = Enumerable.Range(0, request.Runs)
+            .Select(_ => new string(Faker.Name.First().Skip(1).Reverse().Skip(1).Reverse().ToArray()))
+            .ToList();
+
         foreach (var strategy in strategies)
         {
             var runs = new List<double>();
+            var counts = new List<int>();
             
-            for (var i = 0; i < request.Runs; i++)
+            foreach (var query in queries)
             {
                 var stopwatch = Stopwatch.StartNew();
                 
-                var searchRequest = SearchUsersRequest.WithQuery(('a'+i).ToString(), strategy);
-                _ = await _mediator.Send(searchRequest, cancellationToken);
+                var searchRequest = SearchUsersRequest.WithQuery(query, strategy);
+                var searchResponse = await _mediator.Send(searchRequest, cancellationToken);
                 
                 stopwatch.Stop();
                 
                 runs.Add(stopwatch.Elapsed.TotalMilliseconds);
+                counts.Add(searchResponse.Persons.Count);
             }
             
-            results.Add(strategy, BenchmarkStatistics.FromTimes(runs));
+            results.Add(strategy, BenchmarkStatistics.FromResults(runs, counts.Average()));
         }
 
         return new ExecuteBenchmarkResponse { Results = results };
