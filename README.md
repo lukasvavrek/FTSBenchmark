@@ -60,8 +60,15 @@ dotnet ef dbcontext scaffold \
   Npgsql.EntityFrameworkCore.PostgreSQL
 ```
 
+[Full-text search](https://www.cockroachlabs.com/docs/stable/full-text-search)
 [Trigram indexes](https://www.cockroachlabs.com/docs/stable/trigram-indexes)
 [Performance optimisation](https://medium.com/swlh/performance-optimisation-for-wildcards-search-in-postgres-trigram-index-80df0b1f49c7)
+
+> GIN indexes are not lossy for standard queries, but their performance depends logarithmically on the number of unique words.
+
+[Text search indexes] (https://www.postgresql.org/docs/9.4/textsearch-indexes.html)
+
+> GiST indexes are very good for dynamic data and fast if the number of unique words (lexemes) is under 100,000, while GIN indexes will handle 100,000+ lexemes better but are slower to update.
 
 ## Relevant links
 
@@ -74,7 +81,7 @@ dotnet ef dbcontext scaffold \
 
 ## Results
 
-Initial exprimental runs:
+Initial exprimental runs (over 200000 rows):
 ```
 {
   "Like": {
