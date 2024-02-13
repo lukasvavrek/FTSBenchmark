@@ -30,6 +30,14 @@ dotnet ef database update \
 
 ### Postgres
 
+Running Postgres in container:
+```
+docker run --name ftspostgres \
+    -p 5432:5432 \
+    -e POSTGRES_PASSWORD=mysecretpassword \
+    -d postgres 
+```
+
 Manually creating DB:
 ```
 CREATE DATABASE FTSBenchmark;
@@ -69,6 +77,16 @@ dotnet ef dbcontext scaffold \
 [Text search indexes] (https://www.postgresql.org/docs/9.4/textsearch-indexes.html)
 
 > GiST indexes are very good for dynamic data and fast if the number of unique words (lexemes) is under 100,000, while GIN indexes will handle 100,000+ lexemes better but are slower to update.
+
+### Redis
+
+Redis in an in-memory data store, that is widely used in cases when performance matters.
+
+TODO:
+* store relevant information in Redis KEY
+* write seed operation that puts data into redis 
+  * write cleanup method
+
 
 ## Relevant links
 

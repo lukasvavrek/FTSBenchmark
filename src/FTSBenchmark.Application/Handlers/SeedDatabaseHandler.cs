@@ -64,6 +64,7 @@ internal class SeedDatabaseHandler : IRequestHandler<SeedDatabaseRequest, SeedDa
         return new SeedDatabaseResponse();
     }
 
+    // TODO: let's try to batch inserts as well, 100K takes too much time
     private async Task SeedPersonFromFaker(SeedDatabaseRequest request, CancellationToken cancellationToken)
     {
         var models = new List<PersonModel>();
