@@ -8,4 +8,5 @@ public enum SearchStrategy
     LikeNoFront = 3,
     InMemory = 4,
     TrigramPg = 5,
+    Redis = 6,
 }

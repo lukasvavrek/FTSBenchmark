@@ -1,0 +1,58 @@
+{
+  "Like": {
+    "mean": 504.4356375,
+    "average": 504.43563750000004,
+    "percentile10": 422.33323333333334,
+    "percentile50": 528.3233,
+    "percentile90": 562.7673166666667,
+    "averageCount": 2685.5
+  },
+  "Contains": {
+    "mean": 418.632775,
+    "average": 418.632775,
+    "percentile10": 379.78606666666667,
+    "percentile50": 429.69280000000003,
+    "percentile90": 447.9001666666667,
+    "averageCount": 2685.5
+  },
+  "MatchAgainst": {
+    "mean": 86.13872500000001,
+    "average": 86.138725,
+    "percentile10": 66.27908333333333,
+    "percentile50": 81.514,
+    "percentile90": 113.14425000000001,
+    "averageCount": 260.125
+  },
+  "LikeNoFront": {
+    "mean": 290.0940875,
+    "average": 290.09408749999994,
+    "percentile10": 255.17535,
+    "percentile50": 276.55920000000003,
+    "percentile90": 378.7510833333334,
+    "averageCount": 260.625
+  },
+  "InMemory": {
+    "mean": 1805.084175,
+    "average": 1805.0841749999997,
+    "percentile10": 1725.5607,
+    "percentile50": 1792.4729,
+    "percentile90": 1900.8104,
+    "averageCount": 2685.5
+  },
+  "TrigramPg": {
+    "mean": 193.90609999999998,
+    "average": 193.90609999999998,
+    "percentile10": 180.9296,
+    "percentile50": 189.6101,
+    "percentile90": 230.3031666666667,
+    "averageCount": 2685.5
+  },
+  "Redis": {
+    "mean": 86.1959,
+    "average": 86.1959,
+    "percentile10": 8.085,
+    "percentile50": 14.6919,
+    "percentile90": 353.6123000000001,
+    "averageCount": 2477.75
+  }
+}

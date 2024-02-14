@@ -87,6 +87,23 @@ TODO:
 * write seed operation that puts data into redis 
   * write cleanup method
 
+```
+docker run -p 6379:6379 redis/redis-stack-server:latest
+```
+
+```
+module list
+
+hset person:1 FirstName "Manuela" LastName "Connelly" Username "manuela.connelly"
+hgetall person:1
+
+FT.CREATE idx:person on hash  prefix 1 "person:" schema FirstName text sortable LastName text sortable
+FT.INFO idx:person
+
+FT.SEARCH idx:person "Manuela"
+FT.SEARCH idx:person "*man*"
+```
+
 
 ## Relevant links
 

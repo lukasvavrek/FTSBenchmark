@@ -41,6 +41,7 @@ public class ExecuteBenchmarkHandler : IRequestHandler<ExecuteBenchmarkRequest, 
 
         var queries = Enumerable.Range(0, request.Runs)
             .Select(_ => new string(Faker.Name.First().Skip(1).Reverse().Skip(1).Reverse().ToArray()))
+            .Where(x => x.Length >= 3)
             .ToList();
 
         foreach (var strategy in strategies)

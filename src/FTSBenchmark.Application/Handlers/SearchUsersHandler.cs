@@ -2,6 +2,7 @@ using FTSBenchmark.Application.Handlers.SearchUsers;
 using FTSBenchmark.Domain;
 using FTSBenchmark.Infrastructure.Database;
 using FTSBenchmark.Infrastructure.Postgres;
+using FTSBenchmark.Infrastructure.Redis;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -31,12 +32,18 @@ public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUser
 {
     private readonly IBenchmarkDbContext _dbContext;
     private readonly PostgresDbContext _postgresDbContext;
+    private readonly IUserCache _userCache;
     private readonly ILogger<SearchUsersHandler> _logger;
 
-    public SearchUsersHandler(IBenchmarkDbContext dbContext, PostgresDbContext postgresDbContext, ILogger<SearchUsersHandler> logger)
+    public SearchUsersHandler(
+        IBenchmarkDbContext dbContext, 
+        PostgresDbContext postgresDbContext, 
+        IUserCache userCache,
+        ILogger<SearchUsersHandler> logger)
     {
         _dbContext = dbContext;
         _postgresDbContext = postgresDbContext;
+        _userCache = userCache;
         _logger = logger;
     }
     
@@ -52,6 +59,7 @@ public class SearchUsersHandler : IRequestHandler<SearchUsersRequest, SearchUser
             SearchStrategy.TrigramPg => new TrigramPgStrategy(_postgresDbContext).Handle(request, cancellationToken),
             SearchStrategy.InMemory => new InMemoryStrategy(_dbContext).Handle(request, cancellationToken),
             SearchStrategy.LikeNoFront => new LikeNoFrontStrategy(_dbContext).Handle(request, cancellationToken),
+            SearchStrategy.Redis => new RedisStrategy(_userCache).Handle(request, cancellationToken),
             _ => throw new NotImplementedException()
         };
     }

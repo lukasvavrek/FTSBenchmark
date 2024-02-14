@@ -41,6 +41,14 @@ public class BenchmarkController : ControllerBase
         return Ok();
     }
     
+    [HttpPost("data/seed/cache", Name = "Seed cache")]
+    public async Task<IActionResult> SeedCache()
+    {
+        var request = SeedCacheRequest.Empty();
+        _ = await _mediator.Send(request);
+        return Ok();
+    }
+    
     [HttpGet("data/count", Name = "Number of seeded records")]
     public async Task<IActionResult> GetSeedDataCount()
     {

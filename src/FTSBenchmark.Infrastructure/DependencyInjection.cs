@@ -1,5 +1,6 @@
 using FTSBenchmark.Infrastructure.Database;
 using FTSBenchmark.Infrastructure.Postgres;
+using FTSBenchmark.Infrastructure.Redis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,7 @@ public static class DependencyInjection
     {
         SetupMariaDb(services, configuration);
         SetupPostgres(services, configuration);
+        SetupRedis(services, configuration);
     }
     
     private static void SetupMariaDb(IServiceCollection services, IConfiguration configuration)
@@ -43,5 +45,12 @@ public static class DependencyInjection
             // NOTE: using Transient instead of Scoped to void (minimize) caching
             ServiceLifetime.Transient
         );
+    }
+    
+    private static void SetupRedis(IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("Redis");
+        services.AddSingleton<RedisCache>(_ => new RedisCache(connectionString!));
+        services.AddScoped<IUserCache, UserCache>();
     }
 }
